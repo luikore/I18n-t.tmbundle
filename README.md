@@ -1,0 +1,1 @@
+Generate and query Rails I18n keys and messages
