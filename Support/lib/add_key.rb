@@ -1,8 +1,21 @@
+# encoding: UTF-8
+
 require "rubygems" if RUBY_VERSION < '1.9'
 require "yaml"
-YAML::ENGINE.yamler = 'syck'
+YAML::ENGINE.yamler = 'syck' if RUBY_VERSION >= '1.9'
 require "i18n"
 require File.expand_path(ENV['TM_SUPPORT_PATH']) + '/lib/ui'
+
+class String
+  # different from activesupport, also tr ' ' to '_'
+  def underscore
+    gsub(/::/, '/').
+      gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+      gsub(/([a-z\d])([A-Z])/,'\1_\2').
+      tr("- ", "_").
+      downcase
+  end
+end
 
 def key_prefix
   project_directory = File.expand_path ENV['TM_PROJECT_DIRECTORY']
@@ -21,10 +34,13 @@ def en_path
   nil
 end
 
-def find_translation k
+def load_i18n 
   project_directory = File.expand_path ENV['TM_PROJECT_DIRECTORY']
   I18n.load_path = Dir.glob("#{project_directory}/config/locales/*.{yml,yaml}")
   I18n.reload!
+end
+
+def find_translation k
   I18n.t k, :locale => 'en'
 end
 
@@ -89,6 +105,9 @@ def add_translation yml_path, k, v
 end
 
 def add_key input, en_path
+  # TODO : detect if input is key and I18n contains it
+  # TODO : if input seems to be value, select from existing keys that translates into value
+
   # value
   v = input
   if v =~ /^(["']).+\1$/
@@ -98,7 +117,7 @@ def add_key input, en_path
   v.gsub! '.', ''
 
   # key
-  k = v[0..0].downcase + v[1..-1].gsub(/\ ?[A-Z]|\ +/){|c| "_" + c.strip.downcase }
+  k = v[0..0].downcase + v[1..-1].underscore
   full_k = "#{key_prefix}.#{k}"
 
   # new translation if needed
@@ -125,6 +144,7 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   if ENV['TM_PROJECT_DIRECTORY'] and (en_path = en_path())
+    load_i18n
     print(add_key $stdin.read, en_path)
   else
     print $stdin.read

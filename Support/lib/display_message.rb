@@ -1,6 +1,8 @@
+# encoding: UTF-8
+
 require "rubygems" if RUBY_VERSION < '1.9'
 require "yaml"
-YAML::ENGINE.yamler = 'syck'
+YAML::ENGINE.yamler = 'syck' if RUBY_VERSION >= '1.9'
 require 'i18n'
 
 def display_message current_line, column, project_directory, file=nil
