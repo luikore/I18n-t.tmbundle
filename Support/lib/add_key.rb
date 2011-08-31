@@ -112,12 +112,12 @@ def add_key input, en_path
   end
 
   # snippet
-  if quote or ARGV[1] == 'rb'
+  if quote or ARGV[0] == 'rb'
     %Q|t(#{k.inspect})|
   else
-    case ARGV[1]
-    when 'slim'; %Q|= t #{k.inspect}|
-    when 'haml'; %Q|= t #{k.inspect}|
+    case ARGV[0]
+    when 'slim'; quote ? %Q|t(#{k.inspect})| : %Q|= t #{k.inspect}|
+    when 'haml'; quote ? %Q|t(#{k.inspect})| : %Q|= t #{k.inspect}|
     else %Q|<%= t #{k.inspect} %>|
     end
   end
