@@ -1,4 +1,6 @@
-require "rubygems"
+require "rubygems" if RUBY_VERSION < '1.9'
+require "yaml"
+YAML::ENGINE.yamler = 'syck'
 require "i18n"
 require File.expand_path(ENV['TM_SUPPORT_PATH']) + '/lib/ui'
 
@@ -52,7 +54,7 @@ end
 
 def add_translation yml_path, k, v
   # todo quote key if ':' in series
-  series = k.split('.').each_with_index.map do |pair|
+  series = k.split('.').each_with_index.to_a.map do |pair|
     part, i = pair
     indent = ' ' * (i + 1) * 2
     pattern = /^#{Regexp.escape indent}
@@ -69,6 +71,7 @@ def add_translation yml_path, k, v
   series[(id || 0)..-1].each do |e|
     new_key << (e[0] + e[1] + ':')
   end
+  v = v.inspect if v.index("\n")
   new_key.last << ' ' << v
   new_key.map! {|l| l + "\n" }
   new_key = new_key.join

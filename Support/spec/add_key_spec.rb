@@ -32,10 +32,10 @@ en:
   end
 
   it "appends key if parent not found" do
-    add_translation @file, 'x.b.g', 'h'
+    add_translation @file, 'x.b.g', "line 1\nline2"
     res = YAML.load_file(@file)['en']
     puts File.read @file
     res['e'].should == 'f'
-    res['x']['b']['g'].should == 'h'
+    res['x']['b']['g'].should == "line 1\nline2"
   end
 end
