@@ -16,7 +16,7 @@
 	<key>output</key>
 	<string>showAsTooltip</string>
 	<key>scope</key>
-	<string>source.ruby</string>
+	<string>source.ruby, text.slim, text.haml</string>
 	<key>uuid</key>
 	<string>9BEB444E-7673-4549-AB5C-0FD72F563D14</string>
 </dict>
