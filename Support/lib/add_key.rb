@@ -133,6 +133,8 @@ def add_key input, en_path
       k = '.' + k
     end
     add_translation en_path, full_k, v
+  else
+    k = '.' + k
   end
 
   # snippet
