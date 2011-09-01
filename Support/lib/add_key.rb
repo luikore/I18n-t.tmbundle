@@ -126,7 +126,12 @@ def add_key input, en_path
     new_k = TextMate::UI.request_string :default => full_k,
       :title => "New Translation Key (You'd better commit en.yml first)"
     return input if new_k.nil? or new_k.empty?
-    full_k = new_k if new_k != full_k
+    if new_k != full_k
+      full_k = new_k
+      k = new_k
+    else
+      k = '.' + k
+    end
     add_translation en_path, full_k, v
   end
 
