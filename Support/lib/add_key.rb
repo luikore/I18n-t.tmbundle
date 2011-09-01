@@ -34,14 +34,33 @@ def en_path
   nil
 end
 
-def load_i18n 
+def load_i18n
   project_directory = File.expand_path ENV['TM_PROJECT_DIRECTORY']
   I18n.load_path = Dir.glob("#{project_directory}/config/locales/*.{yml,yaml}")
   I18n.reload!
+  I18n.locale = 'en'
 end
 
-def find_translation k
-  I18n.t k, :locale => 'en'
+def keys_containing value, from, result, prefix
+  if value == from
+    result << prefix
+  elsif from.is_a?(Hash)
+    prefix += '.' if !prefix.empty?
+    from.each do |k, v|
+      keys_containing value, v, result, "#{prefix}#{k}"
+    end
+  else
+    # what ?
+  end
+end
+
+def potential_i18n_keys v
+  I18n.t 'x' # make it load
+  data = I18n.backend.instance_variable_get(:@translations)
+  return [] if !data or !data[:en]
+  x = []
+  keys_containing v, data[:en], x, ''
+  x
 end
 
 # seek for best match pos
@@ -105,36 +124,40 @@ def add_translation yml_path, k, v
 end
 
 def add_key input, en_path
-  # TODO : detect if input is key and I18n contains it
-  # TODO : if input seems to be value, select from existing keys that translates into value
-
-  # value
-  v = input
+  v = input.strip
   if v =~ /^(["']).+\1$/
     v = v[1...-1]
     quote = true
   end
-  v.gsub! '.', ''
 
-  # key
-  k = v[0..0].downcase + v[1..-1].underscore
-  full_k = "#{key_prefix}.#{k}"
-
-  # new translation if needed
-  res = find_translation full_k
-  if res =~ /translation\ missing/
-    new_k = TextMate::UI.request_string :default => full_k,
-      :title => "New Translation Key (You'd better commit en.yml first)"
-    return input if new_k.nil? or new_k.empty?
-    if new_k != full_k
-      full_k = new_k
-      k = new_k
+  if ARGV[1] == 'select' # select from translations
+    items = potential_i18n_keys v
+    if !items.empty?
+      k = TextMate::UI.request_item \
+        :title => "Select Translation Key",
+        :prompt => 'Select Translation Key',
+        :items => items
+    end
+    return input if !k
+  else                   # new translation if needed
+    v.gsub! '.', ''
+    k = v[0..0].downcase + v[1..-1].underscore
+    full_k = "#{key_prefix}.#{k}"
+    res = I18n.t full_k
+    if res =~ /translation\ missing/
+      new_k = TextMate::UI.request_string :default => full_k,
+        :title => "New Translation Key"
+      return input if new_k.nil? or new_k.empty?
+      if new_k != full_k
+        full_k = new_k
+        k = new_k
+      else
+        k = '.' + k
+      end
+      add_translation en_path, full_k, v
     else
       k = '.' + k
     end
-    add_translation en_path, full_k, v
-  else
-    k = '.' + k
   end
 
   # snippet

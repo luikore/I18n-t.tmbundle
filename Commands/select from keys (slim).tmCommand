@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>saveModifiedFiles</string>
+	<key>command</key>
+	<string>${TM_RUBY:-/usr/bin/env ruby} "$TM_BUNDLE_SUPPORT/lib/add_key.rb" slim select
+</string>
+	<key>fallbackInput</key>
+	<string>word</string>
+	<key>input</key>
+	<string>selection</string>
+	<key>keyEquivalent</key>
+	<string>~l</string>
+	<key>name</key>
+	<string>select from keys (slim)</string>
+	<key>output</key>
+	<string>insertAsSnippet</string>
+	<key>scope</key>
+	<string>text.slim</string>
+	<key>uuid</key>
+	<string>29ED828F-40C6-4B6D-B246-1310E31C1E2D</string>
+</dict>
+</plist>
