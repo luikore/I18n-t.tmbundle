@@ -1,8 +1,12 @@
 # What
 
-Query / Generate Rails / Padrino I18n Locale for TextMate. Works for erb, slim and haml.
+Query / Generate Rails I18n Locale for TextMate.
+
+Works for erb, slim and haml.
 
 # Install
+
+Make sure i18n gem is installed.
 
     cd ~/Library/Application\ Support/TextMate/Bundles
     git clone git://github.com/luikore/I18n-t.tmbundle.git
@@ -49,11 +53,9 @@ Then we get
 
 TextMate support lib is broken in Ruby 1.9.
 
-Here's a modified ruby support lib for 1.8 and 1.9 compatibilities.
-
-Backup /Applications/TextMate.app/Contents/SharedSupport/Support/lib
+To replace it for 1.8 and 1.9 compatibilities:
 
     cd /Applications/TextMate.app/Contents/SharedSupport/Support/
     mv lib lib.bak
-
-Download [lib.tgz](https://github.com/downloads/luikore/I18n-t.tmbundle/lib.tgz) and unpack  at this dir.
+    wget cloud.github.com/downloads/luikore/I18n-t.tmbundle/lib.tgz
+    tar -zxvf lib.tgz
