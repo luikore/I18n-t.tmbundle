@@ -1,67 +1,7 @@
 # encoding: UTF-8
 
-require "rubygems" if RUBY_VERSION < '1.9'
-require "yaml"
-YAML::ENGINE.yamler = 'syck' if RUBY_VERSION >= '1.9'
-require "i18n"
 require File.expand_path(ENV['TM_SUPPORT_PATH']) + '/lib/ui'
-
-class String
-  # different from activesupport, also tr ' ' to '_'
-  def underscore
-    gsub(/::/, '/').
-      gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-      gsub(/([a-z\d])([A-Z])/,'\1_\2').
-      tr("- ", "_").
-      downcase
-  end
-end
-
-def key_prefix
-  project_directory = File.expand_path ENV['TM_PROJECT_DIRECTORY']
-  file = ENV['TM_FILEPATH']
-  key_name = File.expand_path(file).sub("#{project_directory}/app/views", '')
-  key_name.sub!(/(\.slim|\.haml|\.html\.erb)$/, '')
-  key_name.gsub('/', '.').sub(/^\./, '').sub(/\.$/, '')
-end
-
-def en_path
-  project_directory = File.expand_path ENV['TM_PROJECT_DIRECTORY']
-  %w[en.yml en.yaml].each do |l|
-    file = "#{project_directory}/config/locales/#{l}"
-    return file if File.exist?(file)
-  end
-  nil
-end
-
-def load_i18n
-  project_directory = File.expand_path ENV['TM_PROJECT_DIRECTORY']
-  I18n.load_path = Dir.glob("#{project_directory}/config/locales/*.{yml,yaml}")
-  I18n.reload!
-  I18n.locale = 'en'
-end
-
-def keys_containing value, from, result, prefix
-  if value == from
-    result << prefix
-  elsif from.is_a?(Hash)
-    prefix += '.' if !prefix.empty?
-    from.each do |k, v|
-      keys_containing value, v, result, "#{prefix}#{k}"
-    end
-  else
-    # what ?
-  end
-end
-
-def potential_i18n_keys v
-  I18n.t 'x' # make it load
-  data = I18n.backend.instance_variable_get(:@translations)
-  return [] if !data or !data[:en]
-  x = []
-  keys_containing v, data[:en], x, ''
-  x
-end
+require File.expand_path('i18n_project', File.dirname(__FILE__))
 
 # seek for best match pos
 def seek_pos lines, series
@@ -87,7 +27,7 @@ def seek_pos lines, series
   best_match
 end
 
-def add_translation yml_path, k, v
+def insert_translation yml_path, k, v
   # todo quote key if ':' in series
   series = k.split('.').each_with_index.to_a.map do |pair|
     part, i = pair
@@ -123,15 +63,11 @@ def add_translation yml_path, k, v
   end
 end
 
-def add_key input, en_path
-  v = input.strip
-  if v =~ /^(["']).+\1$/
-    v = v[1...-1]
-    quote = true
-  end
+def add_key i18n_prj, input
+  v, quote = input.unquote
 
   if ARGV[1] == 'select' # select from translations
-    items = potential_i18n_keys v
+    items = i18n_prj.potential_i18n_keys v
     if !items.empty?
       k = TextMate::UI.request_item \
         :title => "Select Translation Key",
@@ -142,10 +78,10 @@ def add_key input, en_path
   else                   # new translation if needed
     v.gsub! '.', ''
     k = v[0..0].downcase + v[1..-1].underscore
-    full_k = "#{key_prefix}.#{k}"
-    res = I18n.t full_k
-    if res =~ /translation\ missing/
-      new_k = TextMate::UI.request_string :default => full_k,
+    full_k = "#{i18n_prj.key_prefix}.#{k}"
+    if i18n_prj.no_translation(full_k)
+      new_k = TextMate::UI.request_string \
+        :default => full_k,
         :title => "New Translation Key"
       return input if new_k.nil? or new_k.empty?
       if new_k != full_k
@@ -154,7 +90,7 @@ def add_key input, en_path
       else
         k = '.' + k
       end
-      add_translation en_path, full_k, v
+      insert_translation i18n_prj.en_yml_path, full_k, v
     else
       k = '.' + k
     end
@@ -173,9 +109,8 @@ def add_key input, en_path
 end
 
 if __FILE__ == $PROGRAM_NAME
-  if ENV['TM_PROJECT_DIRECTORY'] and (en_path = en_path())
-    load_i18n
-    print(add_key $stdin.read, en_path)
+  if i = I18nProject.instance
+    print(add_key i, $stdin.read)
   else
     print $stdin.read
   end

@@ -1,6 +1,6 @@
 # What
 
-Generate and query Rails I18n keys and messages
+Query / Generate Rails / Padrino I18n Locale for TextMate
 
 # Install
 
