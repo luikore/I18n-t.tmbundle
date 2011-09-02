@@ -1,6 +1,6 @@
 # What
 
-Query / Generate Rails / Padrino I18n Locale for TextMate
+Query / Generate Rails / Padrino I18n Locale for TextMate. Works for erb, slim and haml.
 
 # Install
 
