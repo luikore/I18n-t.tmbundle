@@ -23,6 +23,18 @@ class String
     end
     [v, quote]
   end
+  
+  def to_series 
+    split('.').each_with_index.to_a.map do |pair|
+      part, i = pair
+      indent = ' ' * (i + 1) * 2
+      pattern = /^#{Regexp.escape indent}
+        (?:(['"]?)#{Regexp.escape part}\1|\:#{Regexp.escape part})
+        \:[\ \n]
+      /x
+      [indent, part, i, pattern]
+    end
+  end
 end
 
 class I18nProject
@@ -43,13 +55,17 @@ class I18nProject
     end
     if !@en_yml_path
       # TODO show tip
-      raise 'not found'
+      raise 'en.yml not found'
     end
 
     I18n.load_path = Dir.glob("#@project_directory/config/locales/*.{yml,yaml}")
     I18n.reload!
     I18n.locale = 'en'
     I18n.t 'x' # make it load
+  end
+
+  def file_type 
+    @file[/\.\w+$/][1..-1]
   end
 
   # by view template name

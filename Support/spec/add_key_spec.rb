@@ -38,4 +38,10 @@ en:
     res['x']['b']['g'].should == "line 1\nline2"
   end
 
+  it "seek pos" do
+    lines = File.readlines(@file).to_a
+    (seek_pos lines, 'e'.to_series).should == [11, 1]
+    (seek_pos lines, 'a.b1'.to_series).should == [6, 2]
+    (seek_pos lines, 'a.a1.a3'.to_series).should == [3, 2]
+  end
 end

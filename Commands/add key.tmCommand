@@ -5,7 +5,7 @@
 	<key>beforeRunningCommand</key>
 	<string>saveModifiedFiles</string>
 	<key>command</key>
-	<string>${TM_RUBY:-/usr/bin/env ruby} "$TM_BUNDLE_SUPPORT/lib/add_key.rb" haml select
+	<string>${TM_RUBY:-/usr/bin/env ruby} "$TM_BUNDLE_SUPPORT/lib/add_key.rb"
 </string>
 	<key>fallbackInput</key>
 	<string>word</string>
@@ -14,12 +14,12 @@
 	<key>keyEquivalent</key>
 	<string>~l</string>
 	<key>name</key>
-	<string>select from keys (haml)</string>
+	<string>add key and message to en.yml</string>
 	<key>output</key>
 	<string>insertAsSnippet</string>
 	<key>scope</key>
-	<string>text.haml</string>
+	<string>source.ruby, text.html.ruby, text.haml, text.slim</string>
 	<key>uuid</key>
-	<string>219179E1-FBEA-4604-B1CA-EC4C90593E2B</string>
+	<string>7B461EC2-F6E9-45EE-8EDD-0500363033CD</string>
 </dict>
 </plist>
