@@ -81,7 +81,10 @@ def add_key i18n_prj, input, select_from_translations
         :prompt => 'Select Translation Key',
         :items => items
     end
-    return input if !k
+    if !k
+      TextMate::UI.tool_tip "Can not find translation key"
+      return input
+    end
   else # new translation if needed
     v.gsub! '.', ''
     k = v[0..0].downcase + v[1..-1].underscore
