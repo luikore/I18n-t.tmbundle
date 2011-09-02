@@ -33,6 +33,8 @@ Then we get
 
 ![Usage](http://github.com/luikore/I18n-t.tmbundle/raw/master/ScreenShots/2-3.png "Usage")
 
+and the new key inserted into en.yml in the right position
+
 ![Usage](http://github.com/luikore/I18n-t.tmbundle/raw/master/ScreenShots/2-4.png "Usage")
 
 ## Select a key that translates into selected text
