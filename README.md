@@ -51,6 +51,12 @@ Then we get
 
 ![Usage](http://github.com/luikore/I18n-t.tmbundle/raw/master/ScreenShots/3-4.png "Usage")
 
+# Config Output
+
+Add environment variable EN\_YML_FILE for output path (relative to `config/locales`).
+
+For example, `EN\_YML_FILE=new-key.yml` will direct the output of new generated key to `config/locales/new-key.yml`.
+
 # Ruby 1.9
 
 TextMate support lib is broken in Ruby 1.9.

@@ -75,16 +75,18 @@ def add_key i18n_prj, input, select_from_translations
 
   if select_from_translations
     items = i18n_prj.potential_i18n_keys v
-    if !items.empty?
+    if items.empty?
+      TextMate::UI.tool_tip "Can not find tranlation key"
+    else
       k = TextMate::UI.request_item \
         :title => "Select Translation Key",
         :prompt => 'Select Translation Key',
         :items => items
+      if !k
+        TextMate::UI.tool_tip "Canceled"
+      end
     end
-    if !k
-      TextMate::UI.tool_tip "Can not find translation key"
-      return input
-    end
+    return input if !k
   else # new translation if needed
     v.gsub! '.', ''
     k = v[0..0].downcase + v[1..-1].underscore
@@ -102,6 +104,7 @@ def add_key i18n_prj, input, select_from_translations
       end
       insert_translation i18n_prj.en_yml_path, full_k, v
     else
+      TextMate::UI.tool_tip "Translation key '#{full_k}' exists"
       k = '.' + k
     end
   end

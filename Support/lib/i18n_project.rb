@@ -23,8 +23,8 @@ class String
     end
     [v, quote]
   end
-  
-  def to_series 
+
+  def to_series
     split('.').each_with_index.to_a.map do |pair|
       part, i = pair
       indent = ' ' * (i + 1) * 2
@@ -39,7 +39,14 @@ end
 
 class I18nProject
   def self.instance
-    I18nProject.new rescue nil
+    I18nProject.new
+  rescue
+    if defined?(TextMate)
+      TextMate::UI.tool_tip "Error loading I18n: #$!"
+    else
+      puts $!
+    end
+    nil
   end
 
   attr_reader :en_yml_path
@@ -47,15 +54,20 @@ class I18nProject
   def initialize
     @project_directory = File.expand_path ENV['TM_PROJECT_DIRECTORY']
     @file = File.expand_path ENV['TM_FILEPATH']
-    en_yml_potentials = %w[en.yml en.yaml].map do |l|
+    en_yml_potentials =
+      if ENV['EN_YML_FILE']
+        [ENV['EN_YML_FILE']]
+      else
+        %w[en.yml en.yaml]
+      end
+    en_yml_potentials.map! do |l|
       "#@project_directory/config/locales/#{l}"
     end
     @en_yml_path = en_yml_potentials.find do |f|
       File.exist? f
     end
     if !@en_yml_path
-      # TODO show tip
-      raise 'en.yml not found'
+      raise "#{en_yml_potentials.first} not found"
     end
 
     I18n.load_path = Dir.glob("#@project_directory/config/locales/*.{yml,yaml}")
@@ -64,7 +76,7 @@ class I18nProject
     I18n.t 'x' # make it load
   end
 
-  def file_type 
+  def file_type
     @file[/\.\w+$/][1..-1]
   end
 
