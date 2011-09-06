@@ -45,3 +45,16 @@ en:
     (seek_pos lines, 'a.a1.a3'.to_series).should == [3, 2]
   end
 end
+
+describe "indentation control" do
+  ["en:\n  ", "en:\n  \n"].each_with_index do |e, i|
+    it "append key gets right indent #{i}" do
+      f = Tempfile.new 'yml'
+      f.puts e
+      f.close
+      file = f.path
+      insert_translation file, 'a.b', 'c'
+      File.read(file).should == "en:\n  a:\n    b: c"
+    end
+  end
+end

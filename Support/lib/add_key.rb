@@ -31,11 +31,11 @@ end
 
 # insert translation k = v into file named yml_path
 def insert_translation yml_path, k, v
-  # todo quote key if ':' in series
+  # TODO quote key if ':' in series
   series = k.to_series
   lines = File.readlines(yml_path).to_a
 
-  # insert
+  # construct new_key (Array)
   i, id = seek_pos lines, series
   new_key = []
   series = series[(id || 0)..-1]
@@ -54,11 +54,20 @@ def insert_translation yml_path, k, v
   v = v.inspect if v.index("\n")
   new_key.last << ' ' << v
   new_key.map! {|l| l + "\n" }
+
+  # insert new_key (String) into file
   new_key = new_key.join
   if i
     lines.insert i, new_key
   else
-    lines << new_key
+    # remove trailing space
+    while lines.last =~ /^\s*$/
+      lines.pop
+    end
+    if !lines.last.end_with?("\n")
+      lines << "\n"
+    end
+    lines << new_key.rstrip
   end
 
   # write
@@ -69,7 +78,6 @@ def insert_translation yml_path, k, v
 end
 
 # input is likely a value
-# TODO see if it's like the form of a key
 def add_key i18n_prj, input, select_from_translations
   v, quote = input.unquote
 
