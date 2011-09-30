@@ -13,7 +13,9 @@ def display_message current_line, column, project_directory, file=nil
     # fix keys start with '.'
     if file and i18n_key.start_with?(".")
       prefix = File.expand_path(file).sub(File.expand_path("#{project_directory}/app/views"), '')
-      i18n_key = prefix.sub(/\..+$/, '').sub(/^\//, '').gsub("/", '.') + i18n_key
+      prefix = prefix.sub(/\..+$/, '').sub(/^\//, '').gsub("/", '.')
+      prefix.sub! /\._(\w+)$/, '.\1' # partial
+      i18n_key = prefix + i18n_key
     end
 
     locale_files = Dir[File.join(project_directory, '**', 'locales', '*.yml')]
